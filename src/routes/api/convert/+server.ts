@@ -1,5 +1,10 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
-import { convertAndTrimAudio, parseTimestamp } from '$lib/server/youtube';
+import {
+	convertAndTrimAudio,
+	createAudioDownloadResponse,
+	MediaPipelineError,
+	parseTimestamp
+} from '$lib/server/youtube';
 
 export const POST: RequestHandler = async ({ request }) => {
 	let body: {
@@ -28,29 +33,35 @@ export const POST: RequestHandler = async ({ request }) => {
 		let startSeconds = 0;
 		let endSeconds = 0;
 
-		if (trimEnabled && body.startTime && body.endTime) {
-			startSeconds = parseTimestamp(body.startTime) || 0;
-			endSeconds = parseTimestamp(body.endTime) || 0;
+		if (trimEnabled) {
+			if (!body.startTime || !body.endTime) {
+				return json({ error: 'Informe o início e o fim do corte.' }, { status: 400 });
+			}
+
+			const parsedStart = parseTimestamp(body.startTime);
+			const parsedEnd = parseTimestamp(body.endTime);
+			if (parsedStart === null || parsedEnd === null || parsedEnd <= parsedStart) {
+				return json({ error: 'Intervalo de corte inválido.' }, { status: 400 });
+			}
+
+			startSeconds = parsedStart;
+			endSeconds = parsedEnd;
 		}
 
-		const { buffer, fileName } = await convertAndTrimAudio(
+		const audio = await convertAndTrimAudio(
 			url,
 			quality,
 			trimEnabled,
 			startSeconds,
-			endSeconds
+			endSeconds,
+			request.signal
 		);
 
-		return new Response(Uint8Array.from(buffer), {
-			headers: {
-				'Content-Type': 'audio/mpeg',
-				'Content-Length': buffer.length.toString(),
-				'Content-Disposition': `attachment; filename="${encodeURIComponent(fileName)}"; filename*="utf-8''${encodeURIComponent(fileName)}"`,
-				'X-Download-Filename': encodeURIComponent(fileName)
-			}
-		});
-	} catch (err: any) {
+		return createAudioDownloadResponse(audio);
+	} catch (err: unknown) {
 		console.error('Convert API error:', err);
-		return json({ error: err.message || 'Erro durante a conversão do áudio' }, { status: 500 });
+		const status = err instanceof MediaPipelineError ? err.status : 500;
+		const message = err instanceof Error ? err.message : 'Erro durante a conversão do áudio';
+		return json({ error: message }, { status: status === 499 ? 408 : status });
 	}
 };
