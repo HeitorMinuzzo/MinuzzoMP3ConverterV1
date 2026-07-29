@@ -5,6 +5,8 @@ node_modules
 /bin/*
 *.exe
 *.zip
+*.mp3
+*-player-script.js
 
 # Output
 .output
