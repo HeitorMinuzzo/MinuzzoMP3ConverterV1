@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap');
+@import 'tailwindcss';
+
+:root {
+	--font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+	--font-display: 'Outfit', system-ui, sans-serif;
+	--font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+	font-family: var(--font-sans);
+	background-color: #060911;
+	color: #f1f5f9;
+	min-height: 100vh;
+	overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+	width: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: #060911;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #1e293b;
+	border-radius: 9999px;
+	border: 2px solid #060911;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #06b6d4;
+}
+
+/* Premium Dark Cyber Glassmorphism */
+.cyber-panel {
+	background: rgba(11, 16, 27, 0.75);
+	backdrop-filter: blur(24px);
+	-webkit-backdrop-filter: blur(24px);
+	border: 1px solid rgba(255, 255, 255, 0.07);
+	box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+	transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cyber-panel:hover {
+	border-color: rgba(34, 211, 238, 0.25);
+	box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.8), 0 0 30px rgba(6, 182, 212, 0.1);
+}
+
+.cyber-input {
+	background: rgba(6, 9, 17, 0.85);
+	backdrop-filter: blur(12px);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cyber-input:focus-within,
+.cyber-input:focus {
+	border-color: rgba(6, 182, 212, 0.8);
+	box-shadow: 0 0 25px rgba(6, 182, 212, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Glow Button Effect */
+.cyan-glow-btn {
+	position: relative;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	z-index: 1;
+}
+
+.cyan-glow-btn::before {
+	content: '';
+	position: absolute;
+	inset: -2px;
+	border-radius: inherit;
+	background: linear-gradient(135deg, #06b6d4, #3b82f6, #6366f1);
+	filter: blur(12px);
+	opacity: 0.6;
+	z-index: -1;
+	transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.cyan-glow-btn:hover::before {
+	opacity: 0.95;
+	filter: blur(16px);
+}
+
+/* Shimmer Light Effect */
+@keyframes shimmer {
+	0% {
+		background-position: -200% 0;
+	}
+	100% {
+		background-position: 200% 0;
+	}
+}
+
+.animate-shimmer {
+	background: linear-gradient(
+		90deg,
+		rgba(255, 255, 255, 0) 0%,
+		rgba(255, 255, 255, 0.15) 50%,
+		rgba(255, 255, 255, 0) 100%
+	);
+	background-size: 200% 100%;
+	animation: shimmer 3s infinite;
+}
+
+/* Equalizer Bars Animation */
+@keyframes eqBar {
+	0%, 100% {
+		transform: scaleY(0.25);
+	}
+	50% {
+		transform: scaleY(1);
+	}
+}
+
+.eq-bar-1 { animation: eqBar 0.8s ease-in-out infinite; transform-origin: bottom; }
+.eq-bar-2 { animation: eqBar 1.2s ease-in-out infinite 0.2s; transform-origin: bottom; }
+.eq-bar-3 { animation: eqBar 0.9s ease-in-out infinite 0.4s; transform-origin: bottom; }
+.eq-bar-4 { animation: eqBar 1.4s ease-in-out infinite 0.1s; transform-origin: bottom; }
+
+/* Slow Ambient Orbs Pulse */
+@keyframes orbFloat {
+	0%, 100% {
+		transform: translate(0, 0) scale(1);
+		opacity: 0.35;
+	}
+	50% {
+		transform: translate(30px, -20px) scale(1.1);
+		opacity: 0.55;
+	}
+}
+
+.animate-orb-1 {
+	animation: orbFloat 10s ease-in-out infinite;
+}
+
+.animate-orb-2 {
+	animation: orbFloat 14s ease-in-out infinite 2s reverse;
+}
