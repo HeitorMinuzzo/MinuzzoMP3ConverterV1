@@ -1,42 +1,82 @@
-# sv
+# MinuzzoMP3Converter
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Aplicação web moderna para conversão, extração e corte de áudios do YouTube para o formato MP3 em alta qualidade.
 
-## Creating a project
+## Visão Geral
 
-If you're seeing this, you've probably already done this step. Congrats!
+O **MinuzzoMP3Converter** é uma ferramenta desenvolvida para transformar vídeos do YouTube em arquivos de áudio MP3 com alta fidelidade (até 320kbps). A aplicação oferece suporte a pré-visualização de vídeos, ferramentas de corte de trechos específicos de áudio e aplicação automática de metadados ID3 (título, artista/canal).
 
-```sh
-# create a new project
-npx sv create my-app
+## Funcionalidades
+
+- **Conversão de áudio em alta qualidade**: Suporte a diferentes taxas de bits (bitrate), garantindo qualidade de até 320kbps.
+- **Ferramenta de corte (Trimming)**: Permite selecionar o trecho desejado do áudio definindo tempo de início e fim no formato HH:MM:SS.
+- **Injeção de Metadados ID3**: Gravação automática de título do vídeo e nome do canal/artista nos metadados do arquivo MP3 final.
+- **Pré-visualização do vídeo**: Exibição da capa (thumbnail), título, canal e duração antes de realizar o download.
+- **Interface moderna e responsiva**: Interface fluida desenvolvida com Svelte 5 e Tailwind CSS.
+
+## Tecnologias Utilizadas
+
+- **Frontend / Framework**: [SvelteKit 2](https://kit.svelte.dev/) & [Svelte 5](https://svelte.dev/)
+- **Linguagem**: [TypeScript](https://www.typescriptlang.org/)
+- **Estilização**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Componentes e Ícones**: Bits UI & Lucide Svelte
+- **Ferramentas de Extração e Codificação**:
+  - `yt-dlp`: Obtenção e extração das faixas de áudio do YouTube.
+  - `FFmpeg`: Processamento, codificação em MP3 e aplicação de recortes e tags ID3.
+- **Build Tool**: [Vite](https://vitejs.dev/)
+
+## Pré-requisitos
+
+Antes de iniciar, certifique-se de ter instalado em sua máquina:
+
+- Node.js (versão 18 ou superior) ou [Bun](https://bun.sh/).
+- Os executáveis `yt-dlp.exe` e `ffmpeg.exe` presentes no diretório `bin/` da raiz do projeto.
+
+## Instalação e Execução
+
+1. Instale as dependências do projeto:
+
+```bash
+npm install
+# ou usando bun:
+bun install
 ```
 
-To recreate this project with the same configuration:
+2. Inicie o servidor de desenvolvimento:
 
-```sh
-# recreate this project
-bun x sv@0.16.6 create --template minimal --types ts --add tailwindcss="plugins:none" --install bun ./
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
+```bash
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+# ou usando bun:
+bun dev
 ```
 
-## Building
+3. Abra o navegador e acesse a aplicação no endereço indicado (geralmente `http://localhost:5173`).
 
-To create a production version of your app:
+## Compilação para Produção
 
-```sh
+Para gerar a versão de produção:
+
+```bash
 npm run build
 ```
 
-You can preview the production build with `npm run preview`.
+Para visualizar a build de produção localmente:
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```bash
+npm run preview
+```
+
+## Estrutura do Projeto
+
+```text
+Conversor2/
+├── bin/                 # Executáveis locais (yt-dlp.exe, ffmpeg.exe)
+├── src/
+│   ├── lib/
+│   │   ├── components/  # Componentes reutilizáveis de interface (Header, InputCard, PreviewSettingsCard, etc.)
+│   │   ├── server/      # Módulos do servidor de integração com yt-dlp e FFmpeg (youtube.ts)
+│   │   └── state.svelte.ts # Gerenciamento de estado reativo da aplicação
+│   └── routes/          # Páginas e rotas da API SvelteKit (/api/info, /api/convert)
+├── package.json
+└── README.md
+```
