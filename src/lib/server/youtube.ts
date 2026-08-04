@@ -1,5 +1,5 @@
 import { spawn, type ChildProcess } from 'node:child_process';
-import { createReadStream, existsSync } from 'node:fs';
+import { chmodSync, copyFileSync, createReadStream, existsSync, mkdirSync } from 'node:fs';
 import { mkdir, mkdtemp, readdir, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -165,17 +165,63 @@ type MetadataCacheEntry = {
 const metadataCache = new Map<string, MetadataCacheEntry>();
 const pendingMetadata = new Map<string, Promise<VideoMetadata>>();
 
-function getBinaryPath(name: string) {
+function getBinaryPath(name: 'yt-dlp' | 'ffmpeg'): string {
 	const isWin = process.platform === 'win32';
-	const binaryName = isWin ? `${name}.exe` : name;
 
-	const localPath = resolve('bin', binaryName);
-	if (existsSync(localPath)) return localPath;
+	// Explicit string literals so Vercel NFT (Node File Trace) includes the files in the build output
+	const winYtDlp = join(process.cwd(), 'bin', 'yt-dlp.exe');
+	const linuxYtDlp = join(process.cwd(), 'bin', 'yt-dlp');
+	const winFfmpeg = join(process.cwd(), 'bin', 'ffmpeg.exe');
+	const linuxFfmpeg = join(process.cwd(), 'bin', 'ffmpeg');
 
-	const cwdPath = resolve(process.cwd(), 'bin', binaryName);
-	if (existsSync(cwdPath)) return cwdPath;
+	const preferredPath =
+		name === 'yt-dlp'
+			? isWin
+				? winYtDlp
+				: linuxYtDlp
+			: isWin
+				? winFfmpeg
+				: linuxFfmpeg;
 
-	return name;
+	const altPath =
+		name === 'yt-dlp'
+			? resolve('bin', isWin ? 'yt-dlp.exe' : 'yt-dlp')
+			: resolve('bin', isWin ? 'ffmpeg.exe' : 'ffmpeg');
+
+	let sourcePath: string | null = null;
+	if (existsSync(preferredPath)) {
+		sourcePath = preferredPath;
+	} else if (existsSync(altPath)) {
+		sourcePath = altPath;
+	}
+
+	if (!sourcePath) {
+		console.warn(`Binary ${name} not found in bin directory. Falling back to system PATH.`);
+		return name;
+	}
+
+	if (isWin) {
+		return sourcePath;
+	}
+
+	try {
+		chmodSync(sourcePath, 0o755);
+		return sourcePath;
+	} catch {
+		const binaryName = name;
+		const tmpBinDir = join(tmpdir(), 'minuzzo-bin');
+		const targetPath = join(tmpBinDir, binaryName);
+
+		try {
+			mkdirSync(tmpBinDir, { recursive: true });
+			copyFileSync(sourcePath, targetPath);
+			chmodSync(targetPath, 0o755);
+			return targetPath;
+		} catch (err) {
+			console.error(`Failed to copy binary ${binaryName} to /tmp:`, err);
+			return sourcePath;
+		}
+	}
 }
 
 function ytDlpPath() {
