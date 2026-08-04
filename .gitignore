@@ -1,9 +1,10 @@
 node_modules
 
 # Binaries & Executables
-/bin
 /bin/*
-# *.exe  <-- Comentado para permitir arquivos .exe
+!/bin/yt-dlp
+!/bin/ffmpeg
+!/bin/yt-dlp.exe
 *.zip
 *.mp3
 *-player-script.js

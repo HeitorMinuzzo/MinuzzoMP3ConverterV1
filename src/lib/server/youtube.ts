@@ -1,5 +1,5 @@
 import { spawn, type ChildProcess } from 'node:child_process';
-import { createReadStream } from 'node:fs';
+import { createReadStream, existsSync } from 'node:fs';
 import { mkdir, mkdtemp, readdir, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -166,11 +166,25 @@ const metadataCache = new Map<string, MetadataCacheEntry>();
 const pendingMetadata = new Map<string, Promise<VideoMetadata>>();
 
 function ytDlpPath() {
-	return resolve('bin/yt-dlp.exe');
+	const isWin = process.platform === 'win32';
+	const preferred = resolve(isWin ? 'bin/yt-dlp.exe' : 'bin/yt-dlp');
+	if (existsSync(preferred)) return preferred;
+
+	const fallback = resolve(isWin ? 'bin/yt-dlp' : 'bin/yt-dlp.exe');
+	if (existsSync(fallback)) return fallback;
+
+	return 'yt-dlp';
 }
 
 function ffmpegPath() {
-	return resolve('bin/ffmpeg.exe');
+	const isWin = process.platform === 'win32';
+	const preferred = resolve(isWin ? 'bin/ffmpeg.exe' : 'bin/ffmpeg');
+	if (existsSync(preferred)) return preferred;
+
+	const fallback = resolve(isWin ? 'bin/ffmpeg' : 'bin/ffmpeg.exe');
+	if (existsSync(fallback)) return fallback;
+
+	return 'ffmpeg';
 }
 
 export function parseTimestamp(value: string) {
