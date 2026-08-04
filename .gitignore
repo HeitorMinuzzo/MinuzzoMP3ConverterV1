@@ -3,7 +3,7 @@ node_modules
 # Binaries & Executables
 /bin
 /bin/*
-*.exe
+# *.exe  <-- Comentado para permitir arquivos .exe
 *.zip
 *.mp3
 *-player-script.js
