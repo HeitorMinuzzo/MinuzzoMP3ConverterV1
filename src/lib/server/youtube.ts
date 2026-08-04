@@ -165,26 +165,25 @@ type MetadataCacheEntry = {
 const metadataCache = new Map<string, MetadataCacheEntry>();
 const pendingMetadata = new Map<string, Promise<VideoMetadata>>();
 
-function ytDlpPath() {
+function getBinaryPath(name: string) {
 	const isWin = process.platform === 'win32';
-	const preferred = resolve(isWin ? 'bin/yt-dlp.exe' : 'bin/yt-dlp');
-	if (existsSync(preferred)) return preferred;
+	const binaryName = isWin ? `${name}.exe` : name;
 
-	const fallback = resolve(isWin ? 'bin/yt-dlp' : 'bin/yt-dlp.exe');
-	if (existsSync(fallback)) return fallback;
+	const localPath = resolve('bin', binaryName);
+	if (existsSync(localPath)) return localPath;
 
-	return 'yt-dlp';
+	const cwdPath = resolve(process.cwd(), 'bin', binaryName);
+	if (existsSync(cwdPath)) return cwdPath;
+
+	return name;
+}
+
+function ytDlpPath() {
+	return getBinaryPath('yt-dlp');
 }
 
 function ffmpegPath() {
-	const isWin = process.platform === 'win32';
-	const preferred = resolve(isWin ? 'bin/ffmpeg.exe' : 'bin/ffmpeg');
-	if (existsSync(preferred)) return preferred;
-
-	const fallback = resolve(isWin ? 'bin/ffmpeg' : 'bin/ffmpeg.exe');
-	if (existsSync(fallback)) return fallback;
-
-	return 'ffmpeg';
+	return getBinaryPath('ffmpeg');
 }
 
 export function parseTimestamp(value: string) {
